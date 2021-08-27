@@ -11,13 +11,31 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.bubble import Bubble, BubbleButton
+from kivy.core.text import LabelBase
 from kivy.uix.vkeyboard import VKeyboard
 from kivy.clock import Clock
+from kivy.uix.slider import Slider
 from time import sleep
 #import RPi.GPIO as GPIO
 import copy
 import sys
 import time
+import json
+
+LabelBase.register(name='Obelix', 
+                   fn_regular='ObelixPro-cyr.ttf')
+
+LabelBase.register(name='Impacted', 
+                   fn_regular='Impacted2_0-Regular.otf')
+                   
+LabelBase.register(name='Impact', 
+                   fn_regular='impact.ttf')
+
+LabelBase.register(name='Digital', 
+                   fn_regular='Let_s_go_Digital_Regular.ttf')
+
+
+ip = 'http://192.168.1.10'
 
 
 Builder.load_string('''
@@ -27,81 +45,191 @@ Builder.load_string('''
         FloatLayout:
             size: root.width, root.height
             
-            Label:
-                text: "APLIKACJA STEROWANIA KADZIĄ DO WARZENIA BRZECZKI PIWNEJ"
-                pos_hint: {'x':0.275,'y':0.9}
-                font_size: 30
-                halign: 'center'
-                size_hint: (.45, .115)
-            
             Image:
-                source: 'brewing-process.jpg'
-                size: (900,120)
-                pos_hint: {'x':0.001,'y':-0.23}
+                source: 'menu_kadz_1.jpg'
+                size: (1024,600)
+                pos_hint: {'x':0,'y':0}
                 #GRAFIKA: https://www.foghornbrewhouse.com.au/newcastle/craft-beer-brewhouse-brewery/
                 
         GridLayout:
             #pos: (256,340)
-            pos_hint: {'x':0.1,'y':0.6}
+            pos_hint: {'x':0.1,'y':0.42}
             size_hint: (.8,.25)
             cols: 4
             rows: 1
             
-            spacing: 0
+            spacing: 5
             
             Button:
                 size_hint: (.2, .2)
-                font_size: 32
+                font_name:"Impacted"
+                font_size: 36
                 text: 'ZACIERANIE'
                 on_press: root.manager.current = 'zacieranie'
                 background_color: (71/255,71/255,69/255,1)
             Button:
                 size_hint: (.2, .2)
-                font_size: 32
+                font_name:"Impacted"
+                font_size: 36
                 text: 'WARZENIE'
                 on_press: root.manager.current = 'warzenie'
                 background_color: (71/255,71/255,69/255,1)
             Button:
                 size_hint: (.2, .2)
-                font_size: 32
+                font_name:"Impacted"
+                font_size: 36
                 text: 'WAGA'
                 on_press: root.manager.current = 'waga'
                 background_color: (71/255,71/255,69/255,1)
             Button:
                 size_hint: (.2, .2)
-                font_size: 32
+                font_name:"Impacted"
+                font_size: 36
                 text: 'PRZEPISY'
                 on_press: root.manager.current = 'przepisy'
                 background_color: (71/255,71/255,69/255,1)
                 
 <ZacieranieScreen>
     name: 'zacieranie'
+    temp_zadana: temp_zadana
+
     FloatLayout:
         FloatLayout:
             size: root.width, root.height
+
+            Image:
+                source: 'Logo_male_tlo_czarne.jpg'
+                size: .2,.1
+                pos_hint: {'x':-.35,'y':-.42}
             
             Button:
-                size_hint: (0.2, 0.1)
+                size_hint: (0.25, 0.1)
                 pos: (10,530)
-                font_size: 26
-                text: 'Powr\u00f3t do menu'
-                #background_color: (34/255,227/255,20/255,1)
+                font_name:"Impacted"
+                font_size: 36
+                text: 'menu'
+                background_color: (71/255,71/255,69/255,1)
                 on_press: root.manager.current = 'menu'
                 
-            Label:
-                text: "STEROWANIE KADZIĄ DO WARZENIA BRZECZKI PIWNEJ"
-                pos: (0.5,0)
-                pos: (0.5,0)
-                font_size: 30
-                size_hint: (.45, .115)
-                background_color: (2/255,20/255,33/255,1)
-                canvas.before:
-                    Color:
-                        rgba: self.background_color
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
+            Button:
+                size_hint: (0.25, 0.1)
+                pos: (495,530)
+                font_name:"Impacted"
+                font_size: 32
+                text: 'ZACIERANIE START'
+                background_color: (47/255,204/255,12/255,1)
+                on_press: root.start_zacieranie()
+
+            Button:
+                size_hint: (0.25, 0.1)
+                pos: (755,530)
+                font_name:"Impacted"
+                font_size: 32
+                text: 'ZACIERANIE STOP'
+                background_color: (255/255,0/255,0/255,1)
+                on_press: root.stop_zacieranie()
+
+        GridLayout:
+            pos: (450,300)
+            size_hint: (.5,.3)
+            cols: 3
+            rows: 3
         
+            Label:
+                text: "Temp. Zadana (wpisz) :"
+                halign: 'left'
+                font_name:"Impacted"
+                font_size: 32
+                size_hint: (1.5,1)
+                background_color: (71/255,71/255,69/255,1)
+            Label:
+                text: ""
+                halign: 'left'
+                font_name:"Impacted"
+                font_size: 32
+                size_hint: (1,1)
+                background_color: (0,0,0,1)
+
+            TextInput:
+                id: temp_zadana
+                text: "0"
+                halign: 'right'
+                font_name:"Digital"
+                font_size: 55
+                size_hint: (1,1)
+                multiline: False
+                #background_color: (71/255,71/255,69/255,1)
+                background_color: (0/255,0/255,0/255,1)
+                foreground_color: [1,1,1,1]
+                on_focus: root.text_focused()
+            Label:
+                text: "temp. Aktualna :"
+                halign: 'left'
+                font_name:"Impacted"
+                font_size: 32
+                size_hint: (1.5,1)
+                background_color: (71/255,71/255,69/255,1)
+            Label:
+                text: ""
+                halign: 'left'
+                font_name:"Impacted"
+                font_size: 32
+                size_hint: (1,1)
+                background_color: (0,0,0,1)
+            Label:
+                id: temp_akt
+                text: ""
+                halign: 'left'
+                font_name:"Digital"
+                font_size: 65
+                size_hint: (1,1)
+                background_color: (0,0,0,1)
+            Label:
+                text: "Waga aktualna :"
+                halign: 'left'
+                font_name:"Impacted"
+                font_size: 32
+                size_hint: (1.5,1)
+                background_color: (71/255,71/255,69/255,1)
+            Label:
+                text: ""
+                halign: 'left'
+                font_name:"Impacted"
+                font_size: 32
+                size_hint: (1,1)
+                background_color: (0,0,0,1)
+            Label:
+                id: waga_akt
+                text: ""
+                halign: 'left'
+                font_name:"Digital"
+                font_size: 55
+                size_hint: (1,1)
+                background_color: (0,0,0,1)
+
+        GridLayout:
+            pos: (512,100)
+            size_hint: (.4,.2)
+            cols: 1
+            rows: 2
+        
+            Label:
+                text: "AKTUALNY KROK ZACIERANIA (wg. temp) :"
+                halign: 'left'
+                font_name:"Impacted"
+                font_size: 32
+                size_hint: (1,1)
+                background_color: (71/255,71/255,69/255,1)
+            Label:
+                id: krok_zacierania
+                text: root.krok_zacierania
+                font_name:"Impacted"
+                halign: 'left'
+                font_size: 36
+                size_hint: (1,1)
+                background_color: (71/255,71/255,69/255,1)
+
+            
         
 <WarzenieScreen>
     name: 'warzenie'
@@ -110,12 +238,18 @@ Builder.load_string('''
             size: root.width, root.height
             
             Button:
-                size_hint: (0.2, 0.1)
+                size_hint: (0.25, 0.1)
                 pos: (10,530)
-                font_size: 26
-                text: 'Powr\u00f3t do menu'
-                #background_color: (34/255,227/255,20/255,1)
+                font_name:"Impacted"
+                font_size: 36
+                text: 'menu'
+                background_color: (71/255,71/255,69/255,1)
                 on_press: root.manager.current = 'menu'
+
+            Image:
+                source: 'Logo_male_tlo_czarne.jpg'
+                size: (100,50)
+                pos_hint: {'x':-.35,'y':-.42}
                 
 <WagaScreen>
     name: 'waga'
@@ -124,11 +258,32 @@ Builder.load_string('''
             size: root.width, root.height
             
             Button:
-                size_hint: (0.2, 0.1)
+                size_hint: (0.25, 0.1)
                 pos: (10,530)
-                font_size: 26
-                text: 'Powr\u00f3t do menu'
-                #background_color: (34/255,227/255,20/255,1)
+                font_name:"Impacted"
+                font_size: 36
+                text: 'menu'
+                background_color: (71/255,71/255,69/255,1)
+                on_press: root.manager.current = 'menu'
+
+            Image:
+                source: 'Logo_male_tlo_czarne.jpg'
+                size: (100,50)
+                pos_hint: {'x':-.35,'y':-.42}
+
+<PrzepisyScreen>
+    name: 'przepisy'
+    FloatLayout:
+        FloatLayout:
+            size: root.width, root.height
+
+            Button:
+                size_hint: (0.25, 0.1)
+                pos: (10,530)
+                font_name:"Impacted"
+                font_size: 36
+                text: 'menu'
+                background_color: (71/255,71/255,69/255,1)
                 on_press: root.manager.current = 'menu'
 ''')
         
@@ -137,8 +292,47 @@ class MenuScreen(Screen):
     pass
     
 class ZacieranieScreen(Screen):
-    pass
+    temp_zadana = ObjectProperty(None)
+    krok_zacierania = StringProperty('')
+
+    def __init__(self, **kwarg):
+        super().__init__(**kwarg)
+        print("__init__ of ZacieranieScreen is Called")
+        self.temperature = 0
     
+    def text_focused(self):
+        #DEFINICJA KLAWIATURY WYŚWIETLANEJ PRZY NACIŚNIĘCIU NA 'TEXTINPUT'
+        VKeyboard.layout = 'numeric.json'
+        player = VKeyboard()
+        
+        if len(self. temp_zadana.text) <= 0:  # if text empty
+            self.temp_zadana.text = '0'
+        else:
+            print("Error: Empty string")
+
+        self.temperature = float(self.ids.temp_zadana.text)
+        self.temp_zadana.text = str(round(self.temperature,2))
+        print(self.temperature)
+
+        
+    def start_zacieranie(self):
+        Clock.schedule_interval(self.check_stan, 0.5)
+
+    def stop_zacieranie(self):
+        Clock.unschedule(self.check_stan)
+
+    def check_stan(self, *kwargs):
+        if self.temperature > 50 and self.temperature < 53.5:
+            self.krok_zacierania = 'przerwa bialkowa'
+        if self.temperature > 60.5 and self.temperature < 66.6:
+            self.krok_zacierania = 'przerwa maltozowa'
+        if self.temperature > 71.5 and self.temperature < 73.5:
+            self.krok_zacierania = 'przerwa dekstrynujaca'
+        if self.temperature > 76 and self.temperature < 80:
+            self.krok_zacierania = 'wygrzew do filtracji'
+        else:
+            self.krok_zacierania = ''
+
 class WarzenieScreen(Screen):
     pass
     
