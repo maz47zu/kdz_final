@@ -208,7 +208,7 @@ Builder.load_string('''
                 background_color: (0,0,0,1)
 
         GridLayout:
-            pos: (512,100)
+            pos_hint: {'x':.5,'y':.25}
             size_hint: (.4,.2)
             cols: 1
             rows: 2
@@ -217,7 +217,7 @@ Builder.load_string('''
                 text: "AKTUALNY KROK ZACIERANIA (wg. temp) :"
                 halign: 'left'
                 font_name:"Impacted"
-                font_size: 32
+                font_size: 30
                 size_hint: (1,1)
                 background_color: (71/255,71/255,69/255,1)
             Label:
@@ -245,11 +245,96 @@ Builder.load_string('''
                 text: 'menu'
                 background_color: (71/255,71/255,69/255,1)
                 on_press: root.manager.current = 'menu'
+            Button:
+                size_hint: (0.25, 0.1)
+                pos: (495,530)
+                font_name:"Impacted"
+                font_size: 32
+                text: 'Warzenie START'
+                background_color: (47/255,204/255,12/255,1)
+                on_press: root.start_warzenie()
+
+            Button:
+                size_hint: (0.25, 0.1)
+                pos: (755,530)
+                font_name:"Impacted"
+                font_size: 32
+                text: 'Warzenie STOP'
+                background_color: (255/255,0/255,0/255,1)
+                on_press: root.stop_warzenie()
+
+            Label:
+                text: "Ustaw moc grzania [%]:"
+                font_name:"Impacted"
+                halign: 'left'
+                font_size: 30
+                size_hint: (.3,.1)
+                pos_hint: {'x':.5,'y':.75}
 
             Image:
                 source: 'Logo_male_tlo_czarne.jpg'
                 size: (100,50)
                 pos_hint: {'x':-.35,'y':-.42}
+
+            Slider:
+                id: slider
+                min: 0
+                max: 100
+                step: 1
+                value_track: True
+                value_track_color: (0,1,0,1)
+                orientation: 'horizontal'
+                pos_hint: {'x':.45,'y':.6}
+                size_hint: (.5,.2)
+                on_value: moc_zad.text = str(int(self.value))
+                on_touch_up: root.slider_moc(moc_zad.text)
+            
+            
+        
+        GridLayout:
+            pos_hint: {'x':.5,'y':.4}
+            size_hint: (.4,.2)
+            cols: 2
+            rows: 3
+            Label:
+                text: "USTAWIONA MOC:"
+                font_name:"Impacted"
+                halign: 'left'
+                font_size: 30
+                size_hint: (1.5,1)
+            Label:
+                id: moc_zad
+                text: '0'
+                font_name:"Digital"
+                halign: 'right'
+                font_size: 55
+                size_hint: (.5,1)
+            Label:
+                text: "Temp. Aktualna:"
+                font_name:"Impacted"
+                halign: 'left'
+                font_size: 30
+                size_hint: (1.5,1)
+            Label:
+                id: akt_temp
+                text: '0'
+                font_name:"Digital"
+                halign: 'right'
+                font_size: 55
+                size_hint: (.5,1)
+        
+        GridLayout:
+            pos_hint: {'x':.55,'y':-.05}
+            size_hint: (.4,.2)
+            cols: 1
+            rows: 1
+            Label:
+                id: zegar
+                text: root.zegar
+                font_name:"Digital"
+                halign: 'right'
+                font_size: 50
+                size_hint: (.5,1)
                 
 <WagaScreen>
     name: 'waga'
@@ -299,6 +384,7 @@ class ZacieranieScreen(Screen):
         super().__init__(**kwarg)
         print("__init__ of ZacieranieScreen is Called")
         self.temperature = 0
+        self.thread_on = False
     
     def text_focused(self):
         #DEFINICJA KLAWIATURY WYŚWIETLANEJ PRZY NACIŚNIĘCIU NA 'TEXTINPUT'
@@ -316,26 +402,54 @@ class ZacieranieScreen(Screen):
 
         
     def start_zacieranie(self):
-        Clock.schedule_interval(self.check_stan, 0.5)
+        if self.thread_on == False:
+            Clock.schedule_interval(self.check_stan, 0.5)
+            self.thread_on = True
 
     def stop_zacieranie(self):
         Clock.unschedule(self.check_stan)
+        self.thread_on = False
 
     def check_stan(self, *kwargs):
-        if self.temperature > 50 and self.temperature < 53.5:
+        print(self.temperature)
+        if self.temperature >= 45 and self.temperature < 50:
+            self.krok_zacierania = 'przerwa beta-glukanowa'
+        elif self.temperature >= 50 and self.temperature < 53.5:
             self.krok_zacierania = 'przerwa bialkowa'
-        if self.temperature > 60.5 and self.temperature < 66.6:
+        elif self.temperature >= 60.5 and self.temperature < 66.6:
             self.krok_zacierania = 'przerwa maltozowa'
-        if self.temperature > 71.5 and self.temperature < 73.5:
+        elif self.temperature >= 71.5 and self.temperature < 73.5:
             self.krok_zacierania = 'przerwa dekstrynujaca'
-        if self.temperature > 76 and self.temperature < 80:
+        elif self.temperature >= 76 and self.temperature < 80:
             self.krok_zacierania = 'wygrzew do filtracji'
         else:
-            self.krok_zacierania = ''
+            self.krok_zacierania = 'poza progami temperatury'
 
 class WarzenieScreen(Screen):
-    pass
-    
+    slider = NumericProperty(0)
+    moc_zad = StringProperty('')
+    zegar = StringProperty('')
+
+    def __init__(self, **kwarg):
+        super().__init__(**kwarg)
+        print("__init__ of WarzenieScreen is Called")
+        Clock.schedule_interval(self.update, 1)
+        self.moc = 0
+
+    def slider_moc(self, value):
+        self.moc = int(value)
+        print(self.moc)
+
+    def update(self, *args):
+        self.zegar = str(time.asctime())
+        print(self.zegar)
+
+    def start_warzenie(self):
+        pass
+
+    def stop_warzenie(self):
+        pass
+
 class WagaScreen(Screen):
     pass
 
