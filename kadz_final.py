@@ -208,6 +208,19 @@ Builder.load_string('''
                 background_color: (0,0,0,1)
 
         GridLayout:
+            pos_hint: {'x':.55,'y':-.05}
+            size_hint: (.4,.2)
+            cols: 1
+            rows: 1
+            Label:
+                id: zegar
+                text: root.zegar
+                font_name:"Digital"
+                halign: 'right'
+                font_size: 50
+                size_hint: (.5,1)
+
+        GridLayout:
             pos_hint: {'x':.5,'y':.25}
             size_hint: (.4,.2)
             cols: 1
@@ -292,8 +305,8 @@ Builder.load_string('''
             
         
         GridLayout:
-            pos_hint: {'x':.5,'y':.4}
-            size_hint: (.4,.2)
+            pos_hint: {'x':.5,'y':.35}
+            size_hint: (.4,.3)
             cols: 2
             rows: 3
             Label:
@@ -304,6 +317,19 @@ Builder.load_string('''
                 size_hint: (1.5,1)
             Label:
                 id: moc_zad
+                text: '0'
+                font_name:"Digital"
+                halign: 'right'
+                font_size: 55
+                size_hint: (.5,1)
+            Label:
+                text: "Aktualna MOC:"
+                font_name:"Impacted"
+                halign: 'left'
+                font_size: 30
+                size_hint: (1.5,1)
+            Label:
+                id: moc_akt
                 text: '0'
                 font_name:"Digital"
                 halign: 'right'
@@ -379,10 +405,12 @@ class MenuScreen(Screen):
 class ZacieranieScreen(Screen):
     temp_zadana = ObjectProperty(None)
     krok_zacierania = StringProperty('')
+    zegar = StringProperty('')
 
     def __init__(self, **kwarg):
         super().__init__(**kwarg)
         print("__init__ of ZacieranieScreen is Called")
+        Clock.schedule_interval(self.update, 1)
         self.temperature = 0
         self.thread_on = False
     
@@ -400,7 +428,9 @@ class ZacieranieScreen(Screen):
         self.temp_zadana.text = str(round(self.temperature,2))
         print(self.temperature)
 
-        
+    def update(self, *args):
+        self.zegar = str(time.asctime())
+
     def start_zacieranie(self):
         if self.thread_on == False:
             Clock.schedule_interval(self.check_stan, 0.5)
@@ -429,26 +459,35 @@ class WarzenieScreen(Screen):
     slider = NumericProperty(0)
     moc_zad = StringProperty('')
     zegar = StringProperty('')
+    moc_akt = StringProperty('')
 
     def __init__(self, **kwarg):
+
         super().__init__(**kwarg)
         print("__init__ of WarzenieScreen is Called")
         Clock.schedule_interval(self.update, 1)
         self.moc = 0
+        self.kasuj_moc = False
 
     def slider_moc(self, value):
-        self.moc = int(value)
-        print(self.moc)
+        if self.kasuj_moc == False:
+            self.moc = int(value)
+            print(self.moc)
+        else:
+            value = 0
+            self.moc = int(value)
+            moc_akt = '0'
+            slider = 0
+            print(value, self.moc)
 
     def update(self, *args):
         self.zegar = str(time.asctime())
-        print(self.zegar)
 
     def start_warzenie(self):
-        pass
+        self.kasuj_moc = False
 
     def stop_warzenie(self):
-        pass
+        self.kasuj_moc = True
 
 class WagaScreen(Screen):
     pass
