@@ -20,6 +20,7 @@ from time import sleep
 import copy
 import sys
 import time
+from kivy.network.urlrequest import UrlRequest
 import json
 
 LabelBase.register(name='Obelix', 
@@ -35,8 +36,10 @@ LabelBase.register(name='Digital',
                    fn_regular='Let_s_go_Digital_Regular.ttf')
 
 
-ip = 'http://192.168.1.10'
+ip = 'http://192.168.1.11'
 
+tryb_pracy = 'stop'
+extra_var = 0
 
 Builder.load_string('''
 <MenuScreen>
@@ -65,14 +68,16 @@ Builder.load_string('''
                 font_name:"Impacted"
                 font_size: 36
                 text: 'ZACIERANIE'
-                on_press: root.manager.current = 'zacieranie'
+                on_press: root.go_to_zacieranie()
+                #on_press: root.manager.current = 'zacieranie'
                 background_color: (71/255,71/255,69/255,1)
             Button:
                 size_hint: (.2, .2)
                 font_name:"Impacted"
                 font_size: 36
                 text: 'WARZENIE'
-                on_press: root.manager.current = 'warzenie'
+                on_press: root.go_to_warzenie()
+                #on_press: root.manager.current = 'warzenie'
                 background_color: (71/255,71/255,69/255,1)
             Button:
                 size_hint: (.2, .2)
@@ -153,7 +158,7 @@ Builder.load_string('''
             TextInput:
                 id: temp_zadana
                 text: "0"
-                halign: 'right'
+                halign: 'center'
                 font_name:"Digital"
                 font_size: 55
                 size_hint: (1,1)
@@ -178,10 +183,10 @@ Builder.load_string('''
                 background_color: (0,0,0,1)
             Label:
                 id: temp_akt
-                text: ""
+                text: root.temp_akt
                 halign: 'left'
                 font_name:"Digital"
-                font_size: 65
+                font_size: 55
                 size_hint: (1,1)
                 background_color: (0,0,0,1)
             Label:
@@ -200,7 +205,7 @@ Builder.load_string('''
                 background_color: (0,0,0,1)
             Label:
                 id: waga_akt
-                text: ""
+                text: root.waga_akt
                 halign: 'left'
                 font_name:"Digital"
                 font_size: 55
@@ -400,12 +405,28 @@ Builder.load_string('''
         
         
 class MenuScreen(Screen):
-    pass
+    def __init__(self, **kwarg):
+        super().__init__(**kwarg)
+        print("__init__ of MenuScreen is Called")
+
+    def go_to_zacieranie(self):
+        global tryb_pracy
+        if tryb_pracy != 'warzenie':
+            self.manager.current = 'zacieranie'
+            
+
+    def go_to_warzenie(self):
+        global tryb_pracy
+        if tryb_pracy != 'zacieranie':
+            self.manager.current = 'warzenie'
+            
     
 class ZacieranieScreen(Screen):
     temp_zadana = ObjectProperty(None)
     krok_zacierania = StringProperty('')
     zegar = StringProperty('')
+    temp_akt = StringProperty('')
+    waga_akt = StringProperty('')
 
     def __init__(self, **kwarg):
         super().__init__(**kwarg)
@@ -413,6 +434,8 @@ class ZacieranieScreen(Screen):
         Clock.schedule_interval(self.update, 1)
         self.temperature = 0
         self.thread_on = False
+        self.krok_zacierania = 'STOP'
+        #self.data = {}
     
     def text_focused(self):
         #DEFINICJA KLAWIATURY WYŚWIETLANEJ PRZY NACIŚNIĘCIU NA 'TEXTINPUT'
@@ -422,26 +445,55 @@ class ZacieranieScreen(Screen):
         if len(self. temp_zadana.text) <= 0:  # if text empty
             self.temp_zadana.text = '0'
         else:
-            print("Error: Empty string")
+            print('empty string')
+
+        global ip
 
         self.temperature = float(self.ids.temp_zadana.text)
         self.temp_zadana.text = str(round(self.temperature,2))
         print(self.temperature)
+        data = {}
+        data['temperature'] = self.temp_zadana.text
+        json_data = json.dumps(data)
+        response = UrlRequest(ip + '/set_temp',req_body=json_data)
+
 
     def update(self, *args):
         self.zegar = str(time.asctime())
 
     def start_zacieranie(self):
+        global tryb_pracy
+        tryb_pracy = 'zacieranie'
+        global extra_var
+        if extra_var == 0:
+                UrlRequest(ip+'/automatic')
+                print('zalacz automatic')
+                extra_var += 1
+
         if self.thread_on == False:
-            Clock.schedule_interval(self.check_stan, 0.5)
+            Clock.schedule_interval(self.check_stan, 1)
             self.thread_on = True
 
     def stop_zacieranie(self):
+        global tryb_pracy
+        global extra_var
+
+        tryb_pracy = 'stop'
+        extra_var = 0
+
         Clock.unschedule(self.check_stan)
+        self.krok_zacierania = 'STOP'
         self.thread_on = False
 
+    def gotTemperature(self,req,results):
+        self.temp_akt = str((json.loads(results)["temperature"]))
+        self.waga_akt = str((json.loads(results)["waga"]))
+
     def check_stan(self, *kwargs):
-        print(self.temperature)
+        global ip
+
+        data = UrlRequest(ip+'/temperature',self.gotTemperature)
+        
         if self.temperature >= 45 and self.temperature < 50:
             self.krok_zacierania = 'przerwa beta-glukanowa'
         elif self.temperature >= 50 and self.temperature < 53.5:
@@ -470,24 +522,38 @@ class WarzenieScreen(Screen):
         self.kasuj_moc = False
 
     def slider_moc(self, value):
-        if self.kasuj_moc == False:
+        if self.kasuj_moc == True:
             self.moc = int(value)
-            print(self.moc)
+            #print(self.moc)
         else:
             value = 0
             self.moc = int(value)
-            moc_akt = '0'
-            slider = 0
-            print(value, self.moc)
+            self.moc_akt = '0'
+            #print(self.moc)
 
     def update(self, *args):
         self.zegar = str(time.asctime())
 
     def start_warzenie(self):
-        self.kasuj_moc = False
+        self.kasuj_moc = True
+        global extra_var
+        global tryb_pracy
+        tryb_pracy = 'warzenie'
+        if extra_var == 0:
+                UrlRequest(ip+'/manual')
+                print('zalaczam manual')
+                extra_var += 1
 
     def stop_warzenie(self):
-        self.kasuj_moc = True
+        global tryb_pracy
+        global extra_var
+
+        tryb_pracy = 'stop'
+        extra_var = 0
+
+        self.kasuj_moc = False
+        self.moc = 0
+        print(self.moc)
 
 class WagaScreen(Screen):
     pass
