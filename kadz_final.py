@@ -348,7 +348,7 @@ Builder.load_string('''
                 size_hint: (1.5,1)
             Label:
                 id: akt_temp
-                text: '0'
+                text: root.akt_temp
                 font_name:"Digital"
                 halign: 'right'
                 font_size: 55
@@ -512,6 +512,7 @@ class WarzenieScreen(Screen):
     moc_zad = StringProperty('')
     zegar = StringProperty('')
     moc_akt = StringProperty('')
+    akt_temp = StringProperty('')
 
     def __init__(self, **kwarg):
 
@@ -524,6 +525,10 @@ class WarzenieScreen(Screen):
     def slider_moc(self, value):
         if self.kasuj_moc == True:
             self.moc = int(value)
+            data = {}
+            data['moc'] = int(self.moc)
+            json_data = json.dumps(data)
+            response = UrlRequest(ip+'/set_moc',req_body=json_data)
             #print(self.moc)
         else:
             value = 0
@@ -531,8 +536,14 @@ class WarzenieScreen(Screen):
             self.moc_akt = '0'
             #print(self.moc)
 
+    def gotTemperature(self,req,results):
+        self.akt_temp = str((json.loads(results)["temperature"]))
+
     def update(self, *args):
         self.zegar = str(time.asctime())
+
+        global ip
+        data = UrlRequest(ip+'/temperature',self.gotTemperature)
 
     def start_warzenie(self):
         self.kasuj_moc = True
@@ -553,7 +564,10 @@ class WarzenieScreen(Screen):
 
         self.kasuj_moc = False
         self.moc = 0
-        print(self.moc)
+        data = {}
+        data['moc'] = int(self.moc)
+        json_data = json.dumps(data)
+        response = UrlRequest(ip+'/set_moc',req_body=json_data)
 
 class WagaScreen(Screen):
     pass
