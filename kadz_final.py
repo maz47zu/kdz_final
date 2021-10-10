@@ -84,7 +84,7 @@ Builder.load_string('''
                 font_name:"Impacted"
                 font_size: 36
                 text: 'WAGA'
-                on_press: root.manager.current = 'waga'
+                #on_press: root.manager.current = 'waga'
                 background_color: (71/255,71/255,69/255,1)
             Button:
                 size_hint: (.2, .2)
@@ -400,7 +400,206 @@ Builder.load_string('''
                 font_size: 36
                 text: 'menu'
                 background_color: (71/255,71/255,69/255,1)
-                on_press: root.manager.current = 'menu'
+                on_press: root.go_to_menu()
+
+            Image:
+                source: 'Logo_male_tlo_czarne.jpg'
+                size: (100,50)
+                pos_hint: {'x':-.35,'y':-.42}
+            
+            Label:
+                id: styl_piwa
+                text: root.styl_piwa
+                font_name:"Impacted"
+                halign: 'right'
+                font_size: 55
+                size_hint: (.5,.1)
+                pos_hint: {'x':.4,'y':.9}
+            
+            Label:
+                text: 'Surowce (40L):'
+                font_name:"Impacted"
+                halign: 'left'
+                font_size: 28
+                color: 194/255,130/255,12/255,root.visib
+                size_hint: (.1,.1)
+                pos_hint: {'x':.3,'y':.74}
+            Label:
+                text: 'Zacieraniie :'
+                font_name:"Impacted"
+                halign: 'left'
+                font_size: 28
+                color: 194/255,130/255,12/255,root.visib
+                size_hint: (.1,.1)
+                pos_hint: {'x':.315,'y':.45}
+
+        GridLayout:
+            pos_hint: {'x':.28,'y':.55}
+            size_hint: (.35,.2)
+            cols: 1
+            rows: 4
+
+            Label:
+                id: slod1
+                text: root.slod1
+                text_size: self.size
+                font_name:"Impacted"
+                halign: 'left'
+                valign: 'middle'
+                font_size: 28
+                color: 194/255,130/255,12/255,root.visib
+                size_hint: (.1,.1)
+            Label:
+                id: slod2
+                text: root.slod2
+                font_name:"Impacted"
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+                font_size: 28
+                color: 194/255,130/255,12/255,root.visib
+                size_hint: (.1,.1)
+            Label:
+                id: slod3
+                text: root.slod3
+                font_name:"Impacted"
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+                font_size: 28
+                color: 194/255,130/255,12/255,root.visib
+                size_hint: (.1,.1)
+            Label:
+                id: slod4
+                text: root.slod4
+                font_name:"Impacted"
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+                font_size: 28
+                color: 194/255,130/255,12/255,root.visib
+                size_hint: (.1,.1)
+
+        GridLayout:
+            pos_hint: {'x':.28,'y':.26}
+            size_hint: (.35,.2)
+            cols: 1
+            rows: 4
+
+            Label:
+                id: temp1
+                text: root.temp1
+                text_size: self.size
+                font_name:"Impacted"
+                halign: 'left'
+                valign: 'middle'
+                font_size: 28
+                color: 194/255,130/255,12/255,root.visib
+                size_hint: (.1,.1)
+            Label:
+                id: temp2
+                text: root.temp2
+                font_name:"Impacted"
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+                font_size: 28
+                color: 194/255,130/255,12/255,root.visib
+                size_hint: (.1,.1)
+            Label:
+                id: temp3
+                text: root.temp3
+                font_name:"Impacted"
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+                font_size: 28
+                color: 194/255,130/255,12/255,root.visib
+                size_hint: (.1,.1)
+            Label:
+                id: temp4
+                text: root.temp4
+                font_name:"Impacted"
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+                font_size: 28
+                color: 194/255,130/255,12/255,root.visib
+                size_hint: (.1,.1)
+        
+        GridLayout:
+            pos_hint: {'x':.4,'y':.82}
+            size_hint: (.5,.1)
+            cols: 4
+            rows: 1
+
+            Label:
+                text: "IBU"
+                font_name:"Impacted"
+                halign: 'right'
+                font_size: 40
+                color: 0,138/255,0,root.visib
+                size_hint: (.5,.1)
+            Label:
+                id: ibu
+                text: root.ibu
+                font_name:"Impacted"
+                halign: 'center'
+                font_size: 40
+                color: 0,138/255,0,root.visib
+                size_hint: (.5,.1)
+            Label:
+                text: "BLG"
+                font_name:"Impacted"
+                halign: 'center'
+                font_size: 40
+                color: 222/255,81/255,0,root.visib
+                size_hint: (.5,.1)
+            Label:
+                id: blg
+                text: root.blg
+                font_name:"Impacted"
+                halign: 'center'
+                font_size: 40
+                color: 222/255,81/255,0,root.visib
+                size_hint: (.5,.1)
+
+        GridLayout:
+            pos_hint: {'x':.01,'y':.25}
+            size_hint: (.25,.6)
+            cols: 1
+            rows: 4
+
+            spacing: 5
+
+            Button:
+                size_hint: (.2, .2)
+                font_name:"Impacted"
+                font_size: 24
+                text: 'Schreibersdorf ALTBIER'
+                on_press: root.schreibersdorf()
+                background_color: (71/255,71/255,69/255,1)
+            Button:
+                size_hint: (.2, .2)
+                font_name:"Impacted"
+                font_size: 24
+                text: 'Dziubrow IPA'
+                on_press: root.ale()
+                background_color: (71/255,71/255,69/255,1)
+            Button:
+                size_hint: (.2, .2)
+                font_name:"Impacted"
+                font_size: 24
+                text: 'Dziubrow SUMMER ALE'
+                on_press: root.summer_ale()
+                background_color: (71/255,71/255,69/255,1)
+            Button:
+                size_hint: (.2, .2)
+                font_name:"Impacted"
+                font_size: 24
+                text: 'Dziubrow DRY STOUT'
+                on_press: root.stout()
+                background_color: (71/255,71/255,69/255,1)
 ''')
         
         
@@ -451,7 +650,8 @@ class ZacieranieScreen(Screen):
 
         self.temperature = float(self.ids.temp_zadana.text)
         self.temp_zadana.text = str(round(self.temperature,2))
-        print(self.temperature)
+        #print(self.temperature)
+
         data = {}
         data['temperature'] = self.temp_zadana.text
         json_data = json.dumps(data)
@@ -576,8 +776,110 @@ class WykresTempScreen(Screen):
     pass
     
 class PrzepisyScreen(Screen):
-    pass
+    styl_piwa = StringProperty('')
+    blg = StringProperty('')
+    ibu = StringProperty('')
+    slod1 = StringProperty('')
+    slod2 = StringProperty('')
+    slod3 = StringProperty('')
+    slod4 = StringProperty('')
+    temp1 = StringProperty('')
+    temp2 = StringProperty('')
+    temp3 = StringProperty('')
+    temp4 = StringProperty('')
+    visib = NumericProperty(0)
 
+    def __init__(self, **kwarg):
+        super().__init__(**kwarg)
+        print("__init__ of WarzenieScreen is Called")
+        self.recipe = 0
+        self.extra_var = False
+
+    def go_to_menu(self):
+        Clock.unschedule(self.update)
+        self.manager.current = 'menu'
+        self.extra_var = False
+
+    def schreibersdorf(self):
+        if self.extra_var == False:
+            Clock.schedule_interval(self.update, .5)
+            self.extra_var = True
+        self.recipe = 1
+
+    def ale(self):
+        if self.extra_var == False:
+            Clock.schedule_interval(self.update, .5)
+            self.extra_var = True
+        self.recipe = 2
+
+    def summer_ale(self):
+        if self.extra_var == False:
+            Clock.schedule_interval(self.update, .5)
+            self.extra_var = True
+        self.recipe = 3
+
+    def stout(self):
+        if self.extra_var == False:
+            Clock.schedule_interval(self.update, .5)
+            self.extra_var = True
+        self.recipe = 4
+
+    def update(self, *kwargs):
+        if self.recipe == 0:
+            self.visib = 0
+        else:
+            self.visib = 1
+
+        if self.recipe == 1:
+            self.styl_piwa = 'SCHREIBERSDORF ALTBIER'
+            self.ibu = '17.5'
+            self.blg = '11.4'
+            self.slod1 = 'Monachijski Jasny - 7.5 kg'
+            self.slod2 = 'Karmelowy 300EBC - 0.7 kg'
+            self.slod3 = ''
+            self.slod4 = ''
+            self.temp1 = '53*C - 15 min'
+            self.temp2 = '63*C - 30 min'
+            self.temp3 = '73*C - 30 min'
+            self.temp4 = '78*C - 5 min'
+        elif self.recipe == 2:
+            self.styl_piwa = 'DZIUBROW IPA'
+            self.ibu = '40'
+            self.blg = '13'
+            self.slod1 = 'Monachijski Jasny - 2.5 kg'
+            self.slod2 = 'Karmelowy 300EBC - 0.7 kg'
+            self.slod3 = 'Pszeniczny Jasny - 1.0 kg'
+            self.slod4 = 'Pilznenski Jasny - 3.0 kg'
+            self.temp1 = '53*C - 15 min'
+            self.temp2 = '63*C - 30 min'
+            self.temp3 = '73*C - 30 min'
+            self.temp4 = '78*C - 5 min'
+        elif self.recipe == 3:
+            self.styl_piwa = 'DZIUBROW SUMMER ALE'
+            self.ibu = '37'
+            self.blg = '12'
+            self.slod1 = 'Monachijski Jasny - 7.5 kg'
+            self.slod2 = 'Karmelowy 300EBC - 0.7 kg'
+            self.slod3 = 'Pszeniczny Jasny - 1.0 kg'
+            self.slod4 = 'Pilznenski Jasny - 3.0 kg'
+            self.temp1 = '63*C - 30 min'
+            self.temp2 = '73*C - 30 min'
+            self.temp3 = '78*C - 5 min'
+            self.temp4 = ''
+        elif self.recipe == 4:
+            self.styl_piwa = 'DZIUBROW DRY STOUT'  
+            self.ibu = '20'
+            self.blg = '12' 
+            self.slod1 = 'Monachijski Jasny - 7.5 kg'
+            self.slod2 = 'Karmelowy 300EBC - 0.7 kg'
+            self.slod3 = 'Pszeniczny Jasny - 1.0 kg'
+            self.slod4 = 'Pilznenski Jasny - 3.0 kg'
+            self.temp1 = '53*C - 15 min'
+            self.temp2 = '63*C - 30 min'
+            self.temp3 = '73*C - 30 min'
+            self.temp4 = '78*C - 5 min'
+        elif self.recipe == 0:
+            pass
 
 class TestApp(App):
 
