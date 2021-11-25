@@ -22,6 +22,7 @@ import sys
 import time
 from kivy.network.urlrequest import UrlRequest
 import json
+import csv
 
 LabelBase.register(name='Obelix', 
                    fn_regular='ObelixPro-cyr.ttf')
@@ -41,568 +42,8 @@ ip = 'http://192.168.1.11'
 tryb_pracy = 'stop'
 extra_var = 0
 
-Builder.load_string('''
-<MenuScreen>
-    name: 'menu'
-    FloatLayout:
-        FloatLayout:
-            size: root.width, root.height
-            
-            Image:
-                source: 'menu_kadz_1.jpg'
-                size: (1024,600)
-                pos_hint: {'x':0,'y':0}
-                #GRAFIKA: https://www.foghornbrewhouse.com.au/newcastle/craft-beer-brewhouse-brewery/
-                
-        GridLayout:
-            #pos: (256,340)
-            pos_hint: {'x':0.1,'y':0.42}
-            size_hint: (.8,.25)
-            cols: 4
-            rows: 1
-            
-            spacing: 5
-            
-            Button:
-                size_hint: (.2, .2)
-                font_name:"Impacted"
-                font_size: 36
-                text: 'ZACIERANIE'
-                on_press: root.go_to_zacieranie()
-                #on_press: root.manager.current = 'zacieranie'
-                background_color: (71/255,71/255,69/255,1)
-            Button:
-                size_hint: (.2, .2)
-                font_name:"Impacted"
-                font_size: 36
-                text: 'WARZENIE'
-                on_press: root.go_to_warzenie()
-                #on_press: root.manager.current = 'warzenie'
-                background_color: (71/255,71/255,69/255,1)
-            Button:
-                size_hint: (.2, .2)
-                font_name:"Impacted"
-                font_size: 36
-                text: 'WAGA'
-                #on_press: root.manager.current = 'waga'
-                background_color: (71/255,71/255,69/255,1)
-            Button:
-                size_hint: (.2, .2)
-                font_name:"Impacted"
-                font_size: 36
-                text: 'PRZEPISY'
-                on_press: root.manager.current = 'przepisy'
-                background_color: (71/255,71/255,69/255,1)
-                
-<ZacieranieScreen>
-    name: 'zacieranie'
-    temp_zadana: temp_zadana
-
-    FloatLayout:
-        FloatLayout:
-            size: root.width, root.height
-
-            Image:
-                source: 'Logo_male_tlo_czarne.jpg'
-                size: .2,.1
-                pos_hint: {'x':-.35,'y':-.42}
-            
-            Button:
-                size_hint: (0.25, 0.1)
-                pos: (10,530)
-                font_name:"Impacted"
-                font_size: 36
-                text: 'menu'
-                background_color: (71/255,71/255,69/255,1)
-                on_press: root.manager.current = 'menu'
-                
-            Button:
-                size_hint: (0.25, 0.1)
-                pos: (495,530)
-                font_name:"Impacted"
-                font_size: 32
-                text: 'ZACIERANIE START'
-                background_color: (47/255,204/255,12/255,1)
-                on_press: root.start_zacieranie()
-
-            Button:
-                size_hint: (0.25, 0.1)
-                pos: (755,530)
-                font_name:"Impacted"
-                font_size: 32
-                text: 'ZACIERANIE STOP'
-                background_color: (255/255,0/255,0/255,1)
-                on_press: root.stop_zacieranie()
-
-        GridLayout:
-            pos: (450,300)
-            size_hint: (.5,.3)
-            cols: 3
-            rows: 3
-        
-            Label:
-                text: "Temp. Zadana (wpisz) :"
-                halign: 'left'
-                font_name:"Impacted"
-                font_size: 32
-                size_hint: (1.5,1)
-                background_color: (71/255,71/255,69/255,1)
-            Label:
-                text: ""
-                halign: 'left'
-                font_name:"Impacted"
-                font_size: 32
-                size_hint: (1,1)
-                background_color: (0,0,0,1)
-
-            TextInput:
-                id: temp_zadana
-                text: "0"
-                halign: 'center'
-                font_name:"Digital"
-                font_size: 55
-                size_hint: (1,1)
-                multiline: False
-                #background_color: (71/255,71/255,69/255,1)
-                background_color: (0/255,0/255,0/255,1)
-                foreground_color: [1,1,1,1]
-                on_focus: root.text_focused()
-            Label:
-                text: "temp. Aktualna :"
-                halign: 'left'
-                font_name:"Impacted"
-                font_size: 32
-                size_hint: (1.5,1)
-                background_color: (71/255,71/255,69/255,1)
-            Label:
-                text: ""
-                halign: 'left'
-                font_name:"Impacted"
-                font_size: 32
-                size_hint: (1,1)
-                background_color: (0,0,0,1)
-            Label:
-                id: temp_akt
-                text: root.temp_akt
-                halign: 'left'
-                font_name:"Digital"
-                font_size: 55
-                size_hint: (1,1)
-                background_color: (0,0,0,1)
-            Label:
-                text: "Waga aktualna :"
-                halign: 'left'
-                font_name:"Impacted"
-                font_size: 32
-                size_hint: (1.5,1)
-                background_color: (71/255,71/255,69/255,1)
-            Label:
-                text: ""
-                halign: 'left'
-                font_name:"Impacted"
-                font_size: 32
-                size_hint: (1,1)
-                background_color: (0,0,0,1)
-            Label:
-                id: waga_akt
-                text: root.waga_akt
-                halign: 'left'
-                font_name:"Digital"
-                font_size: 55
-                size_hint: (1,1)
-                background_color: (0,0,0,1)
-
-        GridLayout:
-            pos_hint: {'x':.55,'y':-.05}
-            size_hint: (.4,.2)
-            cols: 1
-            rows: 1
-            Label:
-                id: zegar
-                text: root.zegar
-                font_name:"Digital"
-                halign: 'right'
-                font_size: 50
-                size_hint: (.5,1)
-
-        GridLayout:
-            pos_hint: {'x':.5,'y':.25}
-            size_hint: (.4,.2)
-            cols: 1
-            rows: 2
-        
-            Label:
-                text: "AKTUALNY KROK ZACIERANIA (wg. temp) :"
-                halign: 'left'
-                font_name:"Impacted"
-                font_size: 30
-                size_hint: (1,1)
-                background_color: (71/255,71/255,69/255,1)
-            Label:
-                id: krok_zacierania
-                text: root.krok_zacierania
-                font_name:"Impacted"
-                halign: 'left'
-                font_size: 36
-                size_hint: (1,1)
-                background_color: (71/255,71/255,69/255,1)
-
-            
-        
-<WarzenieScreen>
-    name: 'warzenie'
-    FloatLayout:
-        FloatLayout:
-            size: root.width, root.height
-            
-            Button:
-                size_hint: (0.25, 0.1)
-                pos: (10,530)
-                font_name:"Impacted"
-                font_size: 36
-                text: 'menu'
-                background_color: (71/255,71/255,69/255,1)
-                on_press: root.manager.current = 'menu'
-            Button:
-                size_hint: (0.25, 0.1)
-                pos: (495,530)
-                font_name:"Impacted"
-                font_size: 32
-                text: 'Warzenie START'
-                background_color: (47/255,204/255,12/255,1)
-                on_press: root.start_warzenie()
-
-            Button:
-                size_hint: (0.25, 0.1)
-                pos: (755,530)
-                font_name:"Impacted"
-                font_size: 32
-                text: 'Warzenie STOP'
-                background_color: (255/255,0/255,0/255,1)
-                on_press: root.stop_warzenie()
-
-            Label:
-                text: "Ustaw moc grzania [%]:"
-                font_name:"Impacted"
-                halign: 'left'
-                font_size: 30
-                size_hint: (.3,.1)
-                pos_hint: {'x':.5,'y':.75}
-
-            Image:
-                source: 'Logo_male_tlo_czarne.jpg'
-                size: (100,50)
-                pos_hint: {'x':-.35,'y':-.42}
-
-            Slider:
-                id: slider
-                min: 0
-                max: 100
-                step: 1
-                value_track: True
-                value_track_color: (0,1,0,1)
-                orientation: 'horizontal'
-                pos_hint: {'x':.45,'y':.6}
-                size_hint: (.5,.2)
-                on_value: moc_zad.text = str(int(self.value))
-                on_touch_up: root.slider_moc(moc_zad.text)
-            
-            
-        
-        GridLayout:
-            pos_hint: {'x':.5,'y':.35}
-            size_hint: (.4,.3)
-            cols: 2
-            rows: 3
-            Label:
-                text: "USTAWIONA MOC:"
-                font_name:"Impacted"
-                halign: 'left'
-                font_size: 30
-                size_hint: (1.5,1)
-            Label:
-                id: moc_zad
-                text: '0'
-                font_name:"Digital"
-                halign: 'right'
-                font_size: 55
-                size_hint: (.5,1)
-            Label:
-                text: "Aktualna MOC:"
-                font_name:"Impacted"
-                halign: 'left'
-                font_size: 30
-                size_hint: (1.5,1)
-            Label:
-                id: moc_akt
-                text: '0'
-                font_name:"Digital"
-                halign: 'right'
-                font_size: 55
-                size_hint: (.5,1)
-            Label:
-                text: "Temp. Aktualna:"
-                font_name:"Impacted"
-                halign: 'left'
-                font_size: 30
-                size_hint: (1.5,1)
-            Label:
-                id: akt_temp
-                text: root.akt_temp
-                font_name:"Digital"
-                halign: 'right'
-                font_size: 55
-                size_hint: (.5,1)
-        
-        GridLayout:
-            pos_hint: {'x':.55,'y':-.05}
-            size_hint: (.4,.2)
-            cols: 1
-            rows: 1
-            Label:
-                id: zegar
-                text: root.zegar
-                font_name:"Digital"
-                halign: 'right'
-                font_size: 50
-                size_hint: (.5,1)
-                
-<WagaScreen>
-    name: 'waga'
-    FloatLayout:
-        FloatLayout:
-            size: root.width, root.height
-            
-            Button:
-                size_hint: (0.25, 0.1)
-                pos: (10,530)
-                font_name:"Impacted"
-                font_size: 36
-                text: 'menu'
-                background_color: (71/255,71/255,69/255,1)
-                on_press: root.manager.current = 'menu'
-
-            Image:
-                source: 'Logo_male_tlo_czarne.jpg'
-                size: (100,50)
-                pos_hint: {'x':-.35,'y':-.42}
-
-<PrzepisyScreen>
-    name: 'przepisy'
-    FloatLayout:
-        FloatLayout:
-            size: root.width, root.height
-
-            Button:
-                size_hint: (0.25, 0.1)
-                pos: (10,530)
-                font_name:"Impacted"
-                font_size: 36
-                text: 'menu'
-                background_color: (71/255,71/255,69/255,1)
-                on_press: root.go_to_menu()
-
-            Image:
-                source: 'Logo_male_tlo_czarne.jpg'
-                size: (100,50)
-                pos_hint: {'x':-.35,'y':-.42}
-            
-            Label:
-                id: styl_piwa
-                text: root.styl_piwa
-                font_name:"Impacted"
-                halign: 'right'
-                font_size: 55
-                size_hint: (.5,.1)
-                pos_hint: {'x':.4,'y':.9}
-            
-            Label:
-                text: 'Surowce (40L):'
-                font_name:"Impacted"
-                halign: 'left'
-                font_size: 28
-                color: 194/255,130/255,12/255,root.visib
-                size_hint: (.1,.1)
-                pos_hint: {'x':.3,'y':.74}
-            Label:
-                text: 'Zacieraniie :'
-                font_name:"Impacted"
-                halign: 'left'
-                font_size: 28
-                color: 194/255,130/255,12/255,root.visib
-                size_hint: (.1,.1)
-                pos_hint: {'x':.315,'y':.45}
-
-        GridLayout:
-            pos_hint: {'x':.28,'y':.55}
-            size_hint: (.35,.2)
-            cols: 1
-            rows: 4
-
-            Label:
-                id: slod1
-                text: root.slod1
-                text_size: self.size
-                font_name:"Impacted"
-                halign: 'left'
-                valign: 'middle'
-                font_size: 28
-                color: 194/255,130/255,12/255,root.visib
-                size_hint: (.1,.1)
-            Label:
-                id: slod2
-                text: root.slod2
-                font_name:"Impacted"
-                text_size: self.size
-                halign: 'left'
-                valign: 'middle'
-                font_size: 28
-                color: 194/255,130/255,12/255,root.visib
-                size_hint: (.1,.1)
-            Label:
-                id: slod3
-                text: root.slod3
-                font_name:"Impacted"
-                text_size: self.size
-                halign: 'left'
-                valign: 'middle'
-                font_size: 28
-                color: 194/255,130/255,12/255,root.visib
-                size_hint: (.1,.1)
-            Label:
-                id: slod4
-                text: root.slod4
-                font_name:"Impacted"
-                text_size: self.size
-                halign: 'left'
-                valign: 'middle'
-                font_size: 28
-                color: 194/255,130/255,12/255,root.visib
-                size_hint: (.1,.1)
-
-        GridLayout:
-            pos_hint: {'x':.28,'y':.26}
-            size_hint: (.35,.2)
-            cols: 1
-            rows: 4
-
-            Label:
-                id: temp1
-                text: root.temp1
-                text_size: self.size
-                font_name:"Impacted"
-                halign: 'left'
-                valign: 'middle'
-                font_size: 28
-                color: 194/255,130/255,12/255,root.visib
-                size_hint: (.1,.1)
-            Label:
-                id: temp2
-                text: root.temp2
-                font_name:"Impacted"
-                text_size: self.size
-                halign: 'left'
-                valign: 'middle'
-                font_size: 28
-                color: 194/255,130/255,12/255,root.visib
-                size_hint: (.1,.1)
-            Label:
-                id: temp3
-                text: root.temp3
-                font_name:"Impacted"
-                text_size: self.size
-                halign: 'left'
-                valign: 'middle'
-                font_size: 28
-                color: 194/255,130/255,12/255,root.visib
-                size_hint: (.1,.1)
-            Label:
-                id: temp4
-                text: root.temp4
-                font_name:"Impacted"
-                text_size: self.size
-                halign: 'left'
-                valign: 'middle'
-                font_size: 28
-                color: 194/255,130/255,12/255,root.visib
-                size_hint: (.1,.1)
-        
-        GridLayout:
-            pos_hint: {'x':.4,'y':.82}
-            size_hint: (.5,.1)
-            cols: 4
-            rows: 1
-
-            Label:
-                text: "IBU"
-                font_name:"Impacted"
-                halign: 'right'
-                font_size: 40
-                color: 0,138/255,0,root.visib
-                size_hint: (.5,.1)
-            Label:
-                id: ibu
-                text: root.ibu
-                font_name:"Impacted"
-                halign: 'center'
-                font_size: 40
-                color: 0,138/255,0,root.visib
-                size_hint: (.5,.1)
-            Label:
-                text: "BLG"
-                font_name:"Impacted"
-                halign: 'center'
-                font_size: 40
-                color: 222/255,81/255,0,root.visib
-                size_hint: (.5,.1)
-            Label:
-                id: blg
-                text: root.blg
-                font_name:"Impacted"
-                halign: 'center'
-                font_size: 40
-                color: 222/255,81/255,0,root.visib
-                size_hint: (.5,.1)
-
-        GridLayout:
-            pos_hint: {'x':.01,'y':.25}
-            size_hint: (.25,.6)
-            cols: 1
-            rows: 4
-
-            spacing: 5
-
-            Button:
-                size_hint: (.2, .2)
-                font_name:"Impacted"
-                font_size: 24
-                text: 'Schreibersdorf ALTBIER'
-                on_press: root.schreibersdorf()
-                background_color: (71/255,71/255,69/255,1)
-            Button:
-                size_hint: (.2, .2)
-                font_name:"Impacted"
-                font_size: 24
-                text: 'Dziubrow IPA'
-                on_press: root.ale()
-                background_color: (71/255,71/255,69/255,1)
-            Button:
-                size_hint: (.2, .2)
-                font_name:"Impacted"
-                font_size: 24
-                text: 'Dziubrow SUMMER ALE'
-                on_press: root.summer_ale()
-                background_color: (71/255,71/255,69/255,1)
-            Button:
-                size_hint: (.2, .2)
-                font_name:"Impacted"
-                font_size: 24
-                text: 'Dziubrow DRY STOUT'
-                on_press: root.stout()
-                background_color: (71/255,71/255,69/255,1)
-''')
-        
-        
+Builder.load_file('test.kv')
+     
 class MenuScreen(Screen):
     def __init__(self, **kwarg):
         super().__init__(**kwarg)
@@ -619,13 +60,15 @@ class MenuScreen(Screen):
         if tryb_pracy != 'zacieranie':
             self.manager.current = 'warzenie'
             
-    
 class ZacieranieScreen(Screen):
     temp_zadana = ObjectProperty(None)
+    ilosc_slodu = ObjectProperty(None)
     krok_zacierania = StringProperty('')
     zegar = StringProperty('')
     temp_akt = StringProperty('')
     waga_akt = StringProperty('')
+    ilosc_wody = StringProperty('')
+    dane_state = StringProperty('')
 
     def __init__(self, **kwarg):
         super().__init__(**kwarg)
@@ -634,6 +77,9 @@ class ZacieranieScreen(Screen):
         self.temperature = 0
         self.thread_on = False
         self.krok_zacierania = 'STOP'
+        self.ilosc_slodu_waga = 0
+        self.threadTwo = False
+        self.dane_state = 'Zbieraj dane'
         #self.data = {}
     
     def text_focused(self):
@@ -641,7 +87,9 @@ class ZacieranieScreen(Screen):
         VKeyboard.layout = 'numeric.json'
         player = VKeyboard()
         
-        if len(self. temp_zadana.text) <= 0:  # if text empty
+        if len(self.temp_zadana.text) <= 0:  # if text empty
+            self.temp_zadana.text = '0'
+        elif len(self.ilosc_slodu.text) <= 0:  # if text empty
             self.temp_zadana.text = '0'
         else:
             print('empty string')
@@ -657,7 +105,10 @@ class ZacieranieScreen(Screen):
         json_data = json.dumps(data)
         response = UrlRequest(ip + '/set_temp',req_body=json_data)
 
+        self.ilosc_slodu_waga = float(self.ids.ilosc_slodu.text)
+        self.ilosc_wody = str(round(self.ilosc_slodu_waga*3.5,1))
 
+        
     def update(self, *args):
         self.zegar = str(time.asctime())
 
@@ -707,20 +158,59 @@ class ZacieranieScreen(Screen):
         else:
             self.krok_zacierania = 'poza progami temperatury'
 
+    def zbieraj_dane(self):
+        if self.threadTwo == False:
+            self.dane_state = 'Zatrzymaj zbieranie'
+            Clock.schedule_interval(self.data_update, 1)
+            self.threadTwo = True
+            sleep(0.5)
+        elif self.threadTwo == True:
+            self.dane_state = 'Zbieraj dane'
+            Clock.unschedule(self.data_update)
+            self.threadTwo = False
+
+    def data_update(self,*args):
+        dane_wykr = 21.37
+        f = open('dane.csv','a')
+        f.write(str(dane_wykr)+'\n')
+        f.close()
+
 class WarzenieScreen(Screen):
     slider = NumericProperty(0)
     moc_zad = StringProperty('')
     zegar = StringProperty('')
     moc_akt = StringProperty('')
     akt_temp = StringProperty('')
+    czas_stoper = ObjectProperty(None)
+    stoper = StringProperty('')
 
     def __init__(self, **kwarg):
-
         super().__init__(**kwarg)
         print("__init__ of WarzenieScreen is Called")
         Clock.schedule_interval(self.update, 1)
         self.moc = 0
         self.kasuj_moc = False
+        self.pozostaly_czas = 60
+        self.extraVar = False
+        self.min = 0
+        self.sec = 60
+        self.extraVar2 = False
+        self.stoper = '60.00'
+
+    def on_enter(self):
+        if self.extraVar == False:
+            self.text_focused()
+
+    def text_focused(self):
+        VKeyboard.layout = 'numeric.json'
+        player = VKeyboard()
+        
+        if len(self.czas_stoper.text) <= 0:  # if text empty
+            self.czas_stoper.text = '0'
+
+        self.pozostaly_czas = int(self.ids.czas_stoper.text)
+        self.czas = self.pozostaly_czas
+        self.stoper = str(self.pozostaly_czas)+'.00'
 
     def slider_moc(self, value):
         if self.kasuj_moc == True:
@@ -741,7 +231,6 @@ class WarzenieScreen(Screen):
 
     def update(self, *args):
         self.zegar = str(time.asctime())
-
         global ip
         data = UrlRequest(ip+'/temperature',self.gotTemperature)
 
@@ -769,12 +258,61 @@ class WarzenieScreen(Screen):
         json_data = json.dumps(data)
         response = UrlRequest(ip+'/set_moc',req_body=json_data)
 
+    def stoper_start(self):
+        #self.stoper = str(self.pozostaly_czas)
+        if self.extraVar == False:
+            Clock.schedule_interval(self.update_stoper, 1)
+            self.extraVar = True
+
+    def stoper_stop(self):
+        Clock.unschedule(self.update_stoper)
+        self.extraVar = False
+        self.extraVar2 = True
+
+    def stoper_zeruj(self):
+        if self.extraVar2==True:
+            self.pozostaly_czas = self.czas
+            self.stoper = str(self.czas) + '.00'
+            self.min = 0
+            self.sec = 60
+            self.extraVar = False
+
+    def update_stoper(self,*args):
+        #self.min = 0
+        #self.sec = 60
+        self.sec-=1
+        if self.sec == 0:
+            self.min += 1
+            self.sec = 60
+
+        if self.sec>9:
+            self.stoper = str(self.pozostaly_czas-self.min-1)+'.' + str(self.sec)
+        elif self.sec<10:
+            self.stoper = str(self.pozostaly_czas-self.min-1)+'.0' + str(self.sec)
+
+        if (self.pozostaly_czas-self.min-1)<10:
+            self.stoper = '0'+str(self.pozostaly_czas-self.min-1)+'.' + str(self.sec)
+            if self.sec<10:
+                self.stoper = '0'+str(self.pozostaly_czas-self.min-1)+'.0' + str(self.sec)
+
+        if self.pozostaly_czas-self.min == 0:
+            self.stoper_stop()
+            sleep(.1)
+            self.stoper_zeruj()
+
 class WagaScreen(Screen):
     pass
 
 class WykresTempScreen(Screen):
-    pass
+
+    def __init__(self, **kwarg):
+        super().__init__(**kwarg)
+        print("__init__ of WarzenieScreen is Called")
+        #Clock.schedule_interval(self.update, 1)
+        self.moc = 0
+        
     
+
 class PrzepisyScreen(Screen):
     styl_piwa = StringProperty('')
     blg = StringProperty('')
@@ -881,7 +419,7 @@ class PrzepisyScreen(Screen):
         elif self.recipe == 0:
             pass
 
-class TestApp(App):
+class SampleApp(App):
 
     def build(self):
         # Create the screen manager
@@ -898,4 +436,4 @@ class TestApp(App):
 if __name__ == '__main__':
     Window.size=(1024,600)
     Window.fullscreen = False
-    TestApp().run()
+    SampleApp().run()
