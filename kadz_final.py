@@ -37,7 +37,7 @@ LabelBase.register(name='Digital',
                    fn_regular='Let_s_go_Digital_Regular.ttf')
 
 
-ip = 'http://192.168.1.11'
+ip = 'http://192.168.1.7'
 
 tryb_pracy = 'stop'
 extra_var = 0
@@ -90,7 +90,7 @@ class ZacieranieScreen(Screen):
         if len(self.temp_zadana.text) <= 0:  # if text empty
             self.temp_zadana.text = '0'
         elif len(self.ilosc_slodu.text) <= 0:  # if text empty
-            self.temp_zadana.text = '0'
+            self.ilosc_slodu.text = '0'
         else:
             print('empty string')
 
@@ -167,12 +167,18 @@ class ZacieranieScreen(Screen):
         elif self.threadTwo == True:
             self.dane_state = 'Zbieraj dane'
             Clock.unschedule(self.data_update)
+            f = open('dane.csv','a')
+            f.write('\n'+'*****KONIEC POMIARU***************'+'\n')
+            f.close()
             self.threadTwo = False
+        
+    def tarowanie(self):
+        UrlRequest(ip+'/tare')
 
     def data_update(self,*args):
-        dane_wykr = 21.37
+        #dane_wykr = 21.37
         f = open('dane.csv','a')
-        f.write(str(dane_wykr)+'\n')
+        f.write(str(self.temp_akt)+'\n')
         f.close()
 
 class WarzenieScreen(Screen):
@@ -183,6 +189,7 @@ class WarzenieScreen(Screen):
     akt_temp = StringProperty('')
     czas_stoper = ObjectProperty(None)
     stoper = StringProperty('')
+    dane_state = StringProperty('')
 
     def __init__(self, **kwarg):
         super().__init__(**kwarg)
@@ -196,6 +203,8 @@ class WarzenieScreen(Screen):
         self.sec = 60
         self.extraVar2 = False
         self.stoper = '60.00'
+        self.threadTwo = False
+        self.dane_state = 'Zbieraj dane'
 
     def on_enter(self):
         if self.extraVar == False:
@@ -300,9 +309,56 @@ class WarzenieScreen(Screen):
             sleep(.1)
             self.stoper_zeruj()
 
-class WagaScreen(Screen):
-    pass
+    def zbieraj_dane(self):
+        if self.threadTwo == False:
+            self.dane_state = 'Zatrzymaj zbieranie'
+            Clock.schedule_interval(self.data_update, 1)
+            f = open('metoda_oscylacji_03_12_brzeczka.csv','a')
+            f.write('***** Metoda oscylacji, dt = 1s , Tzad = 70*C ***************'+'\n')
+            f.close()
+            self.threadTwo = True
+            sleep(0.5)
+        elif self.threadTwo == True:
+            self.dane_state = 'Zbieraj dane'
+            Clock.unschedule(self.data_update)
+            f = open('metoda_oscylacji_03_12_brzeczka.csv','a')
+            f.write('\n'+'*****KONIEC POMIARU***************'+'\n')
+            f.close()
+            self.threadTwo = False
 
+    def data_update(self,*args):
+        f = open('metoda_oscylacji_03_12_brzeczka.csv','a')
+        f.write(str(self.akt_temp)+'\n')
+        f.close()
+        
+class WagaScreen(Screen):
+    waga_akt = StringProperty('')
+    waga_akt='89.7'
+
+    def __init__(self, **kwarg):
+        super().__init__(**kwarg)
+        print("__init__ of WagaScreen is Called")
+        self.thread = False
+
+    def tarowanie(self):
+        UrlRequest(ip+'/tare')
+
+    def on_enter(self):
+        if self.thread == False:
+            Clock.schedule_interval(self.check_stan,0.5)
+            self.thread = True
+
+    def on_leave(self, *args):
+        Clock.unschedule(self.check_stan)
+        self.thread = False  
+        
+    def gotWaga(self,req,results):
+        self.waga_akt = str((json.loads(results)["waga"]))
+
+    def check_stan(self, *kwargs):
+        global ip
+        data = UrlRequest(ip+'/temperature',self.gotWaga)
+        
 class WykresTempScreen(Screen):
 
     def __init__(self, **kwarg):
@@ -311,8 +367,6 @@ class WykresTempScreen(Screen):
         #Clock.schedule_interval(self.update, 1)
         self.moc = 0
         
-    
-
 class PrzepisyScreen(Screen):
     styl_piwa = StringProperty('')
     blg = StringProperty('')
@@ -321,6 +375,10 @@ class PrzepisyScreen(Screen):
     slod2 = StringProperty('')
     slod3 = StringProperty('')
     slod4 = StringProperty('')
+    chmiel1 = StringProperty('')
+    chmiel2 = StringProperty('')
+    chmiel3 = StringProperty('')
+    chmiel4 = StringProperty('')
     temp1 = StringProperty('')
     temp2 = StringProperty('')
     temp3 = StringProperty('')
@@ -380,6 +438,10 @@ class PrzepisyScreen(Screen):
             self.temp2 = '63*C - 30 min'
             self.temp3 = '73*C - 30 min'
             self.temp4 = '78*C - 5 min'
+            self.chmiel1 = 'Spalt Select - 55min'
+            self.chmiel2 = 'Spalt Select - 25min'
+            self.chmiel3 = 'Spalt Select - 5min'
+            self.chmiel4 = ''
         elif self.recipe == 2:
             self.styl_piwa = 'DZIUBROW IPA'
             self.ibu = '40'

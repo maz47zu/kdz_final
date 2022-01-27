@@ -1,25 +1,23 @@
 <MenuScreen>
     name: 'menu'
     FloatLayout:
-        FloatLayout:
+        FloatLayout:                
             size: root.width, root.height
-            
             Image:
                 source: 'menu_kadz_1.jpg'
                 size: (1024,600)
                 pos_hint: {'x':0,'y':0}
                 #GRAFIKA: https://www.foghornbrewhouse.com.au/newcastle/craft-beer-brewhouse-brewery/
-                
+
         GridLayout:
             #pos: (256,340)
             pos_hint: {'x':0.1,'y':0.42}
             size_hint: (.8,.25)
             cols: 4
             rows: 1
-            
             spacing: 5
-            
-            Button:
+
+            Button:       
                 size_hint: (.2, .2)
                 font_name:"Impacted"
                 font_size: 36
@@ -100,6 +98,16 @@
                 background_color: (71/255,71/255,69/255,1)
                 #on_press: root.manager.current = 'wykres'
                 on_press: root.zbieraj_dane()
+
+            Button:
+                size_hint: (0.25, 0.1)
+                pos_hint: {'x':.39,'y':.12}
+                font_name:"Impacted"
+                font_size: 36
+                text: 'Tarowanie'
+                background_color: (71/255,71/255,69/255,1)
+                #on_press: root.manager.current = 'wykres'
+                on_press: root.tarowanie()
 
         GridLayout:
             pos: (450,300)
@@ -320,14 +328,24 @@
                 size_hint: (.3,.1)
                 pos_hint: {'x':.5,'y':.75}
 
+            #Button:
+                #size_hint: (0.3, 0.1)
+                #pos_hint: {'x':.69,'y':.12}
+                #font_name:"Impacted"
+                #font_size: 36
+                #text: 'wykres temp.'
+                #background_color: (71/255,71/255,69/255,1)
+                #on_press: root.manager.current = 'wykres'
+
             Button:
                 size_hint: (0.3, 0.1)
                 pos_hint: {'x':.69,'y':.12}
                 font_name:"Impacted"
                 font_size: 36
-                text: 'wykres temp.'
+                text: root.dane_state
                 background_color: (71/255,71/255,69/255,1)
-                on_press: root.manager.current = 'wykres'
+                #on_press: root.manager.current = 'wykres'
+                on_press: root.zbieraj_dane()
 
             Image:
                 source: 'Logo_male_tlo_czarne.jpg'
@@ -520,6 +538,27 @@
                 size: (100,50)
                 pos_hint: {'x':-.35,'y':-.42}
 
+            Button:
+                size_hint: (0.25, 0.1)
+                pos_hint: {'x':.39,'y':.22}
+                font_name:"Impacted"
+                font_size: 36
+                text: 'Tarowanie'
+                background_color: (71/255,71/255,69/255,1)
+                #on_press: root.manager.current = 'wykres'
+                on_press: root.tarowanie()
+
+            Label:
+                id: waga_akt
+                text: root.waga_akt
+                halign: 'left'
+                font_name:"Digital"
+                font_size: 200
+                size_hint: (.6,.4)
+                pos_hint: {'x':.2,'y':.4}
+                background_color: (0,0,0,1)
+            
+
 <WykresTempScreen>
     name: 'wykres'
     FloatLayout:
@@ -580,6 +619,14 @@
                 color: 194/255,130/255,12/255,root.visib
                 size_hint: (.1,.1)
                 pos_hint: {'x':.315,'y':.45}
+            Label:
+                text: 'Chmielenie :'
+                font_name:"Impacted"
+                halign: 'left'
+                font_size: 28
+                color: 0,138/255,0,root.visib
+                size_hint: (.1,.1)
+                pos_hint: {'x':.515,'y':.45}
 
         GridLayout:
             pos_hint: {'x':.28,'y':.55}
@@ -626,6 +673,52 @@
                 valign: 'middle'
                 font_size: 28
                 color: 194/255,130/255,12/255,root.visib
+                size_hint: (.1,.1)
+        GridLayout:
+            pos_hint: {'x':.5,'y':.265}
+            size_hint: (.35,.2)
+            cols: 1
+            rows: 4
+
+            Label:
+                id: chmiel1
+                text: root.chmiel1
+                text_size: self.size
+                font_name:"Impacted"
+                halign: 'left'
+                valign: 'middle'
+                font_size: 28
+                color: 0,138/255,0,root.visib
+                size_hint: (.1,.1)
+            Label:
+                id: chmiel2
+                text: root.chmiel2
+                font_name:"Impacted"
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+                font_size: 28
+                color: 0,138/255,0,root.visib
+                size_hint: (.1,.1)
+            Label:
+                id: chmiel3
+                text: root.chmiel3
+                font_name:"Impacted"
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+                font_size: 28
+                color: 0,138/255,0,root.visib
+                size_hint: (.1,.1)
+            Label:
+                id: chmiel4
+                text: root.chmiel4
+                font_name:"Impacted"
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+                font_size: 28
+                color: 0,138/255,0,root.visib
                 size_hint: (.1,.1)
 
         GridLayout:
